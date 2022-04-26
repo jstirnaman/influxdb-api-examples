@@ -1,0 +1,7 @@
+.*
+!.gitignore
+*.log
+node_modules
+package-lock.json
+data/air-sensor-data.lp
+

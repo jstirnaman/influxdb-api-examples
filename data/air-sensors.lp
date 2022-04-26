@@ -1,0 +1,2 @@
+airSensors,sensor_id=TLM0201 temperature="73",humidity="35",co=0.48445310567793615 1633441312 
+airSensors,sensor_id=TLM0202 temperature=75.30007505999716,humidity=35.651929918691714,co=0.5141876544505826 1633441312
