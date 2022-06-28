@@ -1,6 +1,7 @@
-source "./data/v2-fake-data.sh"
+source "../../data/v2-fake-data.sh"
 
-export INFLUX_BUCKET=air_sensor
+export INFLUX_BUCKET=airSensors
+export FAKE_ORG_ID=12ecfe5b8de761f9
 
 INFLUX_TOKEN=$INFLUX_ALL_ACCESS_TOKEN
 INFLUX_READ_WRITE_TOKEN=$INFLUX_ALL_ACCESS_TOKEN
@@ -15,20 +16,21 @@ curl -v \
 	"${INFLUX_URL}/api/v2/buckets/$1?orgID=${INFLUX_ORG_ID}" \
 	--header "Authorization: Token ${INFLUX_TOKEN}" | jq .
 }
-get_bucket
+# get_bucket
 #get_bucket $INFLUX_BUCKET_ID
 
 function write() {
 echo $timestamp;
 curl -v \
-	"${INFLUX_URL}/api/v2/write?org=${INFLUX_ORG}&bucket=${INFLUX_BUCKET}&precision=s" \
-	--header "Authorization: Token ${INFLUX_READ_WRITE_TOKEN}" \
+        "${INFLUX_URL}/api/v2/write?org=${INFLUX_ORG}&bucket=${INFLUX_BUCKET}&precision=s" \
+        --header "Authorization: Token ${INFLUX_READ_WRITE_TOKEN}" \
         --header "Accept: application/json" \
-	--data-binary @- <<'EOF'
+        --data-binary @- <<'EOF' | jq .
 # Literal backslash at start of string field value.
 # Escaped backslash at end of string field value.
 airSensor,sensor_id=TLM\=0201 desc="\=My data==\\"
-
+airSensors,sensor_id=TLM0201 temperature=75.30007505999716,humidity=35.651929918691714,co=0.5141876544505826
+airSensors,sensor_id=TLM0202 temperature=76.30007505999716,humidity=36.651929918691714,co=0.5241876544505826
 # Measurement name with literal backslashes.
 # Escaped = in tag value.
 # Escaped \ and escaped " in string field value.
