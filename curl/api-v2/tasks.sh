@@ -84,7 +84,7 @@ curl -v --request PATCH \
         --header "Content-type: application/json" \
 	--header "Authorization: Token ${INFLUX_TOKEN}" \
   --data '{
-    "type": "basic"
+    "status": "active"
   }' | jq .
 }
 # update_task 09956e2b48778000
