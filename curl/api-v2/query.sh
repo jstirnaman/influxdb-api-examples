@@ -1,5 +1,5 @@
 export INFLUX_BUCKET=airSensors
-export FAKE_ORG_ID=34f334f34f34f434
+export FAKE_ORG_ID=12ecfe5b8de761f8
 
 cat <<EOF > task_runs_query
   from(bucket:"_tasks")
@@ -50,11 +50,23 @@ function analyze() {
    --header 'Content-type: application/json' \
    --header 'Accept: application/json' \
    --data-binary @- << EOF | jq .
-     { "query": "from(bucket: \"iot_center\")\
+     { "query": "from(foo: \"iot_center\")\
                  |> range(start: -90d)\
                  |> filter(fn: (r) => r._measurement == \"environment\")",
         "type": "flux"
       }
 EOF
 }
-analyze
+# analyze
+
+function get_suggestions() {
+  curl -v --request GET \
+   "${INFLUX_URL}/api/v2/query/suggestions" \
+   --header "Authorization: Token ${INFLUX_ALL_ACCESS_TOKEN}" \
+   --header 'Content-type: application/json' \
+   --header 'Accept: application/json' \
+ | jq .
+}
+# get_suggestions
+
+query

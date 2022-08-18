@@ -1,4 +1,4 @@
-export INFLUX_BUCKET=airSensors
+export INFLUX_BUCKET=iot_center
 # export INFLUX_BUCKET_ID=453438dd3110164d
 # export INFLUX_ORG=jstirnamaninflux
 # export INFLUX_ORG_ID=12ecfe5b8de761f8
@@ -30,9 +30,9 @@ curl -v -XPOST \
     --header "Accept: application/json" \
     --data-binary @- << EOF | jq .
         {
-			"start": "2022-04-27T14:59:19.000Z",
-			"stop": "2022-04-27T14:59:19.000Z",
-			"predicate": "sensor_id=TLM0202"
+			"start": "2022-06-01T14:59:19.000Z",
+			"stop": "2022-06-10T14:59:19.000Z",
+			"predicate": "_measurement=environment"
 		}
 EOF
 }

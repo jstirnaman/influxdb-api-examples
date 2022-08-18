@@ -6,7 +6,6 @@ curl -vv --request POST \
                "${INFLUX_URL}/api/v2/signin/" \
 	       --header "Authorization: Basic ${INFLUX_USER_NAME}:${INFLUX_ALL_ACCESS_TOKEN}" | jq .
 }
-# signin_basic
 
 # Filter results by org ID.
 function get_auths() {
@@ -33,14 +32,12 @@ function get_auth() {
     --header 'Content-type: application/json' \
     | jq .
 }
-# get_auth
 
 function getLegacyAuths() {
   curl -vv -request GET \
   "${INFLUX_URL}/private/legacy/authorizations" \
    --header "Authorization: Token ${INFLUX_OP_TOKEN}"
 }
-#getLegacyAuths
 
 function update() {
 # Set the user's first authorization to `inactive`.
@@ -73,22 +70,6 @@ curl --request GET \
   --header "Authorization: Token ${INFLUX_OP_TOKEN}" \
   --header 'Content-type: application/json'
 }
-# delete
-
-######################################################
-# The example below uses common command-line tools
-# `curl`, `jq`, and `|` with the InfluxDB API.
-# 1. Create a user and build an authorization object for the user ID.
-# 2. Create the new authorization.
-# 3. Return the new token.
-# 4. List
-######################################################
-
-# List all users names.
-#curl --request GET \
-#  "http://localhost:8086/api/v2/users" \
-#  --header "Authorization: Token ${INFLUX_TOKEN}" \
-#  --header 'Content-type: application/json' | \
 
 ######################################################
 # The example below uses the common command-line tools `curl` and `jq`
@@ -113,11 +94,6 @@ curl --request GET \
 #  --header 'Content-type: application/json' | \
 #
 #jq '.authorizations[] | select(.permissions[] | select(.action=="write")) | select(.status=="active")'
-
-#curl -vv --request GET \
-#  "http://localhost:8086/metrics" \
-#  --header "Authorization: Token ${INFLUX_TOKEN}" \
-#  --header 'Content-type: application/json' | grep auth
 
 #
 #curl -vv --request POST \
@@ -152,7 +128,6 @@ curl --request GET \
 #
 #jq. '.authorizations[] | .token'
 
-
 # Set the first authorization as `inactive`.
 # jq '.authorizations[0].id'
 #curl --request PATCH \
@@ -164,44 +139,8 @@ curl --request GET \
 #	    "status": "inactive"
 #          }' | jq .
 #
-
-# Delete a user.
-# curl --request DELETE \
-#	"http://localhost:8086/api/v2/users/" \
-#  --header "Authorization: Token ${INFLUX_TOKEN}" \
-#  --header 'Content-type: application/json' \
-#  --data '{"name": "user2"}' \
-#  | jq .
-#  | jq '.[0] | {orgID: "48c88459ee424a04", "user": .userID, "permissions":[{"action": "read", "resource": {"type": "buckets"}}] }' | \
-
-# Create a user.
-
-# curl --request DELETE \
-#	"http://localhost:8086/api/v2/users/" \
-#  --header "Authorization: Token ${INFLUX_TOKEN}" \
-#  --header 'Content-type: application/json' \
-#  --data '{"name": "user2"}' \
-#  | jq '.[0]
-##  | jq '.[0] | {orgID: "48c88459ee424a04", "user": .userID, "permissions":[{"action": "read", "resource": {"type": "buckets"}}] }' | \
-
-# Delete a user.
-# curl --request DELETE \
-#	"http://localhost:8086/api/v2/users/" \
-#  --header "Authorization: Token ${INFLUX_TOKEN}" \
-#  --header 'Content-type: application/json' \
-#  --data '{"name": "user2"}' \
-#  | jq .
-#  | jq '.[0] | {orgID: "48c88459ee424a04", "user": .userID, "permissions":[{"action": "read", "resource": {"type": "buckets"}}] }' | \
-#
-#
 # curl --request POST \
 #	"http://localhost:8086/api/v2/authorizations" \
 #  --header "Authorization: Token ${INFLUX_TOKEN}" \
 #  --header 'Content-type: application/json' \
   # --data '{"orgID": "48c88459ee424a04", "user": "user1", "permissions":[{"action": "read", "resource": {"type": "buckets"}}] }'
-#
-#
-#curl --request GET \
-#	"http://localhost:8086/api/v2/authorizations?user=user1" \
-#  --header "Authorization: Token ${INFLUX_TOKEN}" \
-#  --header 'Content-type: application/json'

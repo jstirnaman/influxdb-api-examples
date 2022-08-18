@@ -19,7 +19,7 @@ curl -v -X 'POST' \
     "description": "a named function that gathers the last point from a bucket",
     "orgID": "${INFLUX_ORG_ID}",
     "script": "${SCRIPT}",
-     "language": "flux"
+    "language": "flux"
   }
 EOF
 }
@@ -43,19 +43,15 @@ curl -vv -X 'PATCH' \
 EOF
 }
 
-# update_script 085138a111448000 
-
 find() {
   SCRIPT_ID="$1"
-  
+
   curl -X 'GET' \
     "${INFLUX_URL}/api/v2/scripts/${SCRIPT_ID}" \
     --header "Authorization: Token ${INFLUX_API_TOKEN}" \
     --header 'accept: application/json' \
     --header 'Content-Type: application/json' | jq .
 }
-
-# find 085138a111448000
 
 list() {
   curl -X 'GET' \
@@ -66,12 +62,10 @@ list() {
     --data-urlencode 'org=jstirnamaninflux&limit=10' | jq .
 }
 
-# list
-
 find_and_update() {
   FIND_TEXT="-7d"
   REPLACE_TEXT="params.range"
-  
+
   curl -X 'GET' \
     "${INFLUX_URL}/api/v2/scripts" \
     --header "Authorization: Token ${INFLUX_API_TOKEN}" \
@@ -81,12 +75,9 @@ find_and_update() {
     | jq .['script']
 }
 
-# find_and_update
-
 invoke_post() {
-
   SCRIPT_ID=$1
-  
+
   curl -vv -X 'POST' \
     "${INFLUX_URL}/api/v2/scripts/${SCRIPT_ID}/invoke" \
     --header "Authorization: Token ${INFLUX_API_TOKEN}" \
@@ -95,18 +86,15 @@ invoke_post() {
     --data-binary '{ "params": { "mybucket": "air_sensor" } }'
 }
 
-# invoke_post 085a61bb65a20000 
-
-## Add and invoke a script takes two params.
+## Add and invoke a script, takes two params.
 create_invoke_with_params() {
-# "orgID": "${INFLUX_ORG_ID}",
 new_script_id=$(
   curl -v -X 'POST' \
     "${INFLUX_URL}/api/v2/scripts" \
     --header "Authorization: Token ${INFLUX_API_TOKEN}" \
     --header 'Accept: application/json' \
     --header 'Content-Type: application/json' \
-    --data-binary @- << EOF | jq -r '.id' 
+    --data-binary @- << EOF | jq -r '.id'
     {
       "name": "noDesc",
       "description": "Returns filtered and grouped points from a bucket.",
@@ -124,9 +112,8 @@ EOF
      #            |> group(columns: [params.groupField])",
 )
 
-#new_script_id=085a2960eaa20000
 echo $new_script_id
- curl -vv -X 'POST' \
+ curl -v
      "${INFLUX_URL}/api/v2/scripts/${new_script_id}/invoke" \
      --header "Authorization: Token ${INFLUX_API_TOKEN}" \
      --header 'Accept: application/csv' \
@@ -156,4 +143,3 @@ delete() {
     "${INFLUX_URL}/api/v2/scripts/${SCRIPT_ID}" \
     --header "Authorization: Token ${INFLUX_API_TOKEN}"
 }
-# delete 
