@@ -20,33 +20,24 @@ cat <<EOF > iot_center_environment
 EOF
 
 function query() {
-  basic=$(echo "${INFLUX_USER_NAME}:${INFLUX_ALL_ACCESS_TOKEN}" | base64)
+  INFLUX_API_TOKEN=$INFLUX_ALL_ACCESS_TOKEN
+  basic=$(echo "${INFLUX_USER_NAME}:${INFLUX_API_TOKEN}" | base64)
 
-  # curl -vv --request POST \
-  #   "${INFLUX_URL}/api/v2/query?org=${INFLUX_ORG}&bucket=${INFLUX_BUCKET}&precision=s" \
-  #   --header "Authorization: Token ${INFLUX_ALL_ACCESS_TOKEN}" \
-  #   --header 'Content-type: application/vnd.flux' \
-  #   --header 'Accept: application/csv' \
-  #   --data 'from(bucket:"air_sensor")
-  #        |> range(start: -30d)
-  #        |> filter(fn: (r) => r._measurement == "airSensors")' \
-  #  | grep .
-
+  ORG_NAME=FAKE_ORG_ID
+  ORG_ID=FAKE_ORG_ID
   curl -vv --request POST \
-   "${INFLUX_URL}/api/v2/query?org=${FAKE_ORG_ID}&orgID=${FAKE_ORG_ID}&bucket=${INFLUX_BUCKET}&precision=s" \
-   --header "Authorization: Token ${INFLUX_ALL_ACCESS_TOKEN}" \
+   "${INFLUX_URL}/api/v2/query?org=${ORG_NAME}&orgID=${ORG_ID}&bucket=${INFLUX_BUCKET}&precision=s" \
+   --header "Authorization: Token ${INFLUX_API_TOKEN}" \
    --header 'Content-type: application/vnd.flux' \
    --header 'Accept: application/csv' \
    --data @airSensors_query \
  | grep .
 }
-# query
-
 
 function analyze() {
   curl -v --request POST \
    "${INFLUX_URL}/api/v2/query/analyze" \
-   --header "Authorization: Token ${INFLUX_ALL_ACCESS_TOKEN}" \
+   --header "Authorization: Token ${INFLUX_API_TOKEN}" \
    --header 'Content-type: application/json' \
    --header 'Accept: application/json' \
    --data-binary @- << EOF | jq .
@@ -57,16 +48,26 @@ function analyze() {
       }
 EOF
 }
-# analyze
 
 function get_suggestions() {
   curl -v --request GET \
    "${INFLUX_URL}/api/v2/query/suggestions" \
-   --header "Authorization: Token ${INFLUX_ALL_ACCESS_TOKEN}" \
+   --header "Authorization: Token ${INFLUX_API_TOKEN}" \
    --header 'Content-type: application/json' \
    --header 'Accept: application/json' \
  | jq .
 }
-# get_suggestions
 
-query
+function query_ast() {
+curl --request POST "$INFLUX_URL/api/v2/query/ast" \
+--header 'Content-Type: application/json' \
+--header 'Accept: application/json' \
+--header "Authorization: Token $INFLUX_API_TOKEN" \
+--data-binary @- << EOL
+    {
+      "query": "from(bucket: \"$INFLUX_BUCKET_NAME\")\
+      |> range(start: -5m)\
+      |> filter(fn: (r) => r._measurement == \"example-measurement\")"
+    }
+EOL
+}

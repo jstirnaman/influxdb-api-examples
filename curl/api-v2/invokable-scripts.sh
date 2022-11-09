@@ -1,7 +1,5 @@
 #!/bin/bash -e
 
-source "./cloud.env"
-
 INFLUX_API_TOKEN=$INFLUX_ALL_ACCESS_TOKEN
 INFLUX_ORG_ID=$INFLUX_ORG
 
@@ -15,7 +13,7 @@ curl -v -X 'POST' \
   --header 'Content-Type: application/json' \
   --data-binary @- << EOF | jq .
   {
-    "name": "myFirstNamedFunc",
+    "name": "script_1",
     "description": "a named function that gathers the last point from a bucket",
     "orgID": "${INFLUX_ORG_ID}",
     "script": "${SCRIPT}",
@@ -96,11 +94,11 @@ new_script_id=$(
     --header 'Content-Type: application/json' \
     --data-binary @- << EOF | jq -r '.id'
     {
-      "name": "noDesc",
+      "name": "script_1",
       "description": "Returns filtered and grouped points from a bucket.",
       "script": "from(bucket: params.bucket) \
-		 |> range(start: duration(v: params.rangeStart)) \
-                 |> filter(fn: (r) => r._field == params.filterField or r._field == params.filterField2) \
+		             |> range(start: duration(v: params.rangeStart)) \
+                 |> filter(fn: (r) => r._field == params.filterField) \
                  |> group(columns: [params.groupColumn])",
        "language": "flux"
     }
@@ -131,8 +129,6 @@ echo $new_script_id
 EOF
 }
 
-create_invoke_with_params
-
 delete() {
   ## Get first script ID from list.
   script_id=$(list | jq -r '.scripts[0] | .id')
@@ -143,3 +139,6 @@ delete() {
     "${INFLUX_URL}/api/v2/scripts/${SCRIPT_ID}" \
     --header "Authorization: Token ${INFLUX_API_TOKEN}"
 }
+
+# create_invoke_with_params
+create_script

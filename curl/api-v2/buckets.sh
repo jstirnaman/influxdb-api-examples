@@ -1,26 +1,19 @@
 #!/bin/bash -e
 
-INFLUX_TOKEN=$INFLUX_ALL_ACCESS_TOKEN
-INFLUX_READ_WRITE_TOKEN=$INFLUX_ALL_ACCESS_TOKEN
-
-echo "Influx token: ${INFLUX_TOKEN}"
-echo "Read write token: ${INFLUX_READ_WRITE_TOKEN}"
-
 timestamp=`date +%s`;
 
 function delete_bucket() {
   curl -v --request DELETE \
-	"${INFLUX_URL}/api/v2/buckets?orgID=${INFLUX_ORG_ID}" \
+	"$INFLUX_URL/api/v2/buckets?orgID=${INFLUX_ORG_ID}" \
 	--header "Authorization: Token ${INFLUX_TOKEN}" | jq .
 }
 
-function get_bucket() {
-curl -v --request GET \
-	"${INFLUX_URL}/api/v2/buckets/$1?orgID=${INFLUX_ORG_ID}" \
-	--header "Authorization: Token ${INFLUX_TOKEN}" | jq .
+function get_buckets() {
+  params=$1
+
+  curl -v "$INFLUX_URL/api/v2/buckets${params}" \
+    --header "Authorization: Token ${INFLUX_TOKEN}"
 }
-get_bucket
-#get_bucket $INFLUX_BUCKET_ID
 
 function create_bucket() {
 curl -v --request POST \
@@ -29,7 +22,7 @@ curl -v --request POST \
 	--header "Authorization: Token ${INFLUX_TOKEN}" \
   --data '{
     "orgID": "'"${INFLUX_ORG_ID}"'",
-    "name": "iot-center",
+    "name": "'"iot-center-${timestamp}"'",
     "description": "My IoT Center Bucket",
     "rp": "string",
     "retentionRules": [
@@ -42,3 +35,9 @@ curl -v --request POST \
     "schemaType": "implicit"
   }'
 }
+
+# create_bucket | jq '.'
+get_buckets "?limit=3&orgID=${INFLUX_ORG_ID}" | jq '.buckets[] | [.id, .type, .orgID]'
+get_buckets "?limit=3" | jq '.buckets[] | [.id, .type, .orgID]'
+get_buckets "?orgID=${INFLUX_ORG_ID}" | jq '.buckets[] | [.id, .type, .orgID]'
+get_buckets "?limit=1&offset=3" | jq '.buckets[] | [.id, .type, .orgID]'
