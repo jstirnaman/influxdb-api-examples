@@ -1,4 +1,3 @@
-export INFLUX_BUCKET=airSensors
 export FAKE_ORG_ID=12ecfe5b8de761f8
 
 cat <<EOF > task_runs_query
@@ -20,18 +19,42 @@ cat <<EOF > iot_center_environment
 EOF
 
 function query() {
-  INFLUX_API_TOKEN=$INFLUX_ALL_ACCESS_TOKEN
+  INFLUX_API_TOKEN=$INFLUX_READ_WRITE_TOKEN
   basic=$(echo "${INFLUX_USER_NAME}:${INFLUX_API_TOKEN}" | base64)
 
   ORG_NAME=FAKE_ORG_ID
   ORG_ID=FAKE_ORG_ID
   curl -vv --request POST \
-   "${INFLUX_URL}/api/v2/query?org=${ORG_NAME}&orgID=${ORG_ID}&bucket=${INFLUX_BUCKET}&precision=s" \
+   "${INFLUX_URL}/api/v2/query?org=${INFLUX_ORG}&orgID=${INFLUX_ORG_ID}&bucket=${INFLUX_BUCKET}&precision=s" \
    --header "Authorization: Token ${INFLUX_API_TOKEN}" \
    --header 'Content-type: application/vnd.flux' \
    --header 'Accept: application/csv' \
    --data @airSensors_query \
  | grep .
+}
+
+function query_flux_sql() {
+curl --request POST \
+"$INFLUX_URL/api/v2/query" \
+  --header "Authorization: Token $INFLUX_TOKEN" \
+  --header "Content-Type: application/vnd.flux" \
+  --header "Accept: application/csv" \
+  --data "
+    import \"experimental/iox\"
+
+    iox.sql(
+        bucket: \"${INFLUX_BUCKET}\",
+        query: \"
+            SELECT
+              *
+            FROM
+              home
+            WHERE
+              time >= '2023-03-09T08:00:00Z'
+              AND time <= '2023-03-16T20:00:00Z'
+        \",
+    )"
+
 }
 
 function analyze() {
@@ -71,3 +94,5 @@ curl --request POST "$INFLUX_URL/api/v2/query/ast" \
     }
 EOL
 }
+
+query_flux_sql

@@ -18,7 +18,7 @@ curl -v --request GET \
 	--header "Authorization: Token ${INFLUX_TOKEN}" | jq .
 }
 
-#get_bucket_schema a7d5558b880a93da 
+#get_bucket_schema $INFLUX_BUCKET_ID 
 
 function create_bucket_schema() {
 curl -v --request POST \
@@ -36,11 +36,28 @@ curl -v --request POST \
 	  ]
         }' | jq .
 }
-create_bucket_schema a7d5558b880a93da 
-#get_bucket_schema a7d5558b880a93da 
+create_bucket_schema $INFLUX_BUCKET_ID 
+#get_bucket_schema $INFLUX_BUCKET_ID
+
+function update_bucket_schema() {
+curl -v --request PATCH \
+	"${INFLUX_URL}/api/v2/buckets/$1/schema/measurements/$2" \
+	--header "Authorization: Token ${INFLUX_TOKEN}" \
+        --header "Content-type: application/json" \
+        --data '{
+	"columns": [
+          {"name": "time", "type": "timestamp"},
+          {"name": "room", "type": "tag"},
+          {"name": "temp", "type": "field"},
+          {"name": "hum", "type": "field", "dataType": "float"},
+          {"name": "co", "type": "field", "dataType": "integer"},
+          {"name": "buzz", "type": "field", "dataType": "float"}
+	  ]
+        }' | jq .
+}
 
 function write() {
-# my_explicit='a7d5558b880a93da'
+# my_explicit='$INFLUX_BUCKET_ID'
 my_explicit='my_explicit'
 
 #cat <<EOF > air-sensor.lp

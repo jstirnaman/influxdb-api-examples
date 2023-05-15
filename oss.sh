@@ -1,1 +1,1 @@
-set -o allexport; source .env.oss; set +o allexport
+set -o allexport; source default.env; source .env.oss; set +o allexport

@@ -36,8 +36,31 @@ curl -v --request POST \
   }'
 }
 
+function create_explicit_bucket() {
+curl -v --request POST \
+	"${INFLUX_URL}/api/v2/buckets" \
+        --header "Content-type: application/json" \
+	--header "Authorization: Token ${INFLUX_TOKEN}" \
+  --data '{
+    "orgID": "'"${INFLUX_ORG_ID}"'",
+    "name": "'"jason-explicit-api-${timestamp}"'",
+    "description": "My Explicit Bucket",
+    "rp": "string",
+    "retentionRules": [
+      {
+        "type": "expire",
+        "everySeconds": 86400,
+        "shardGroupDurationSeconds": 0
+      }
+    ],
+    "schemaType": "explicit"
+  }'
+}
+
 # create_bucket | jq '.'
-get_buckets "?limit=3&orgID=${INFLUX_ORG_ID}" | jq '.buckets[] | [.id, .type, .orgID]'
-get_buckets "?limit=3" | jq '.buckets[] | [.id, .type, .orgID]'
-get_buckets "?orgID=${INFLUX_ORG_ID}" | jq '.buckets[] | [.id, .type, .orgID]'
-get_buckets "?limit=1&offset=3" | jq '.buckets[] | [.id, .type, .orgID]'
+# create_explicit_bucket
+get_buckets
+# get_buckets "?limit=3&orgID=${INFLUX_ORG_ID}" | jq '.buckets[] | [.id, .type, .orgID]'
+# get_buckets "?limit=3" | jq '.buckets[] | [.id, .type, .orgID]'
+# get_buckets "?orgID=${INFLUX_ORG_ID}" | jq '.buckets[] | [.id, .type, .orgID]'
+# get_buckets "?limit=1&offset=3" | jq '.buckets[] | [.id, .type, .orgID]'

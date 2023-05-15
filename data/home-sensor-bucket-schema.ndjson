@@ -1,0 +1,5 @@
+{"name": "time", "type": "timestamp"}
+{"name": "room", "type": "tag"}
+{"name": "temp", "type": "field", "dataType": "float"}
+{"name": "hum", "type": "field", "dataType": "float"}
+{"name": "co", "type": "field", "dataType": "integer"}

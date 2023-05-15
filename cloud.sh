@@ -1,2 +1,2 @@
-set -o allexport; source .env.cloud; set +o allexport
+set -o allexport; source default.env; source .env.cloud; set +o allexport
 
